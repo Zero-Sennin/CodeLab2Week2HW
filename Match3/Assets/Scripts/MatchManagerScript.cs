@@ -244,6 +244,11 @@ public class MatchManagerScript : MonoBehaviour {
     /// </summary>
     public virtual void ResetFullMatchesCount()
     {
+        if (numFullMatches >= 3)
+        {
+            gameManager.UpdateScore(10 * numFullMatches);
+        }
+
         numFullMatches = 0;
     }
 }

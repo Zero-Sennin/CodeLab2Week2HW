@@ -53,7 +53,18 @@ public class GameManagerScript : MonoBehaviour {
 			} else {
 				//if the grid is full and there are no matches, wait for the player to make a move (and look for it in InputManager)
 				inputManager.SelectToken();
-			}
+
+                if (currentMatchChainTime > 0f)
+                {
+                    currentMatchChainTime -= Time.deltaTime;
+                }
+
+                else if (currentMatchChainTime <= 0f)
+                {
+                    currentMatchChainTime = 0f;
+                    matchManager.ResetFullMatchesCount();
+                }
+            }
 
 		} else {
 			if(!moveTokenManager.move){
@@ -69,18 +80,7 @@ public class GameManagerScript : MonoBehaviour {
 
         scoreText.text = "Score: " + score;
         matchChainText.text = "Match Chain: " + matchManager.NumFullMatches;
-        matchBonusTimerMeter.transform.localScale = new Vector3(currentMatchChainTime/maxChainTime, 1f, 1f);
-        
-        if (currentMatchChainTime > 0f)
-        {
-            currentMatchChainTime -= Time.deltaTime;
-        }
-
-        else if (currentMatchChainTime <= 0f)
-        {
-            currentMatchChainTime = 0f;
-            matchManager.ResetFullMatchesCount();
-        }
+        matchBonusTimerMeter.transform.localScale = new Vector3(currentMatchChainTime/maxChainTime, 1f, 1f); 
 	}
 		
 	/// <summary>
