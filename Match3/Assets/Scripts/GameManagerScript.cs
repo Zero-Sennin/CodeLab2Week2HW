@@ -27,6 +27,7 @@ public class GameManagerScript : MonoBehaviour {
 
     int score;
     public Text scoreText, matchChainText;
+    public GameObject floatTextPrefab;
 
     public Image matchBonusTimerMeter;
 
@@ -117,6 +118,9 @@ public class GameManagerScript : MonoBehaviour {
     public virtual void UpdateScore(int valueToAdd)
     {
         score += valueToAdd;
+        GameObject floatText = Instantiate(floatTextPrefab, GameObject.Find("Canvas").transform.position, Quaternion.identity) as GameObject;
+        floatText.transform.SetParent(GameObject.Find("Canvas").transform, false);
+        floatText.GetComponent<UIItem_ScoreIncreaseScript>().SetTextValue(valueToAdd);
     }
 
 	/// <summary>
