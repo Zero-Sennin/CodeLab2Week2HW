@@ -26,7 +26,11 @@ public class GameManagerScript : MonoBehaviour {
 	GameObject selected;
 
     int score;
-    public Text scoreText;
+    public Text scoreText, matchChainText;
+
+    public Image matchBonusTimerMeter;
+
+    float currentMatchChainTime, maxChainTime;
 
 	public virtual void Start () {
 		//load the tokens, make the grid, and create references to the other scripts
@@ -64,6 +68,19 @@ public class GameManagerScript : MonoBehaviour {
 		}
 
         scoreText.text = "Score: " + score;
+        matchChainText.text = "Match Chain: " + matchManager.NumFullMatches;
+        matchBonusTimerMeter.transform.localScale = new Vector3(currentMatchChainTime/maxChainTime, 1f, 1f);
+        
+        if (currentMatchChainTime > 0f)
+        {
+            currentMatchChainTime -= Time.deltaTime;
+        }
+
+        else if (currentMatchChainTime <= 0f)
+        {
+            currentMatchChainTime = 0f;
+            matchManager.ResetFullMatchesCount();
+        }
 	}
 		
 	/// <summary>
@@ -153,4 +170,10 @@ public class GameManagerScript : MonoBehaviour {
 		//then, we put this token into the array of tokens
 		gridArray[x, y] = token;
 	}
+
+    public void SetBonusTimer(float maxTime)
+    {
+        maxChainTime = maxTime;
+        currentMatchChainTime = maxChainTime;
+    }
 }

@@ -4,9 +4,20 @@ using System.Collections;
 public class MatchManagerScript : MonoBehaviour {
 
 	protected GameManagerScript gameManager;    //"protected" means this field is public to child scripts
-												//but not to unrelated scripts
+                                                //but not to unrelated scripts
 
-	public virtual void Start () {
+
+    int numFullMatches = 0;
+
+    public int NumFullMatches
+    {
+        get
+        {
+            return numFullMatches;
+        }
+    }
+
+    public virtual void Start () {
 		gameManager = GetComponent<GameManagerScript>();
 	}
 
@@ -175,10 +186,9 @@ public class MatchManagerScript : MonoBehaviour {
     /// <returns>The number of tokens destroyed.</returns>
     public virtual int RemoveMatches(){
 		int numRemoved = 0;
-
 		//iterate across entire grid, looking for matches
-		//wherever a horizontal match of three or more tokens is found, destroy them
-		for(int x = 0; x < gameManager.gridWidth; x++){
+        //wherever a horizontal match of three or more tokens is found, destroy them
+        for(int x = 0; x < gameManager.gridWidth; x++){
 			for(int y = 0; y < gameManager.gridHeight ; y++){
 				if(x < gameManager.gridWidth - 2){
 
@@ -217,7 +227,23 @@ public class MatchManagerScript : MonoBehaviour {
             }
 		}
 
-        gameManager.UpdateScore(5);
+        //If we've made a full match, increment the total number of matches we've made in this chain.
+        if (numRemoved >= 2)
+        {
+            numFullMatches += 1;
+        }
+
+        //Increase our score based on how many full matches we've made in this current combo.
+        gameManager.UpdateScore(5 * numFullMatches);
+        gameManager.SetBonusTimer(5f);
 		return numRemoved;
 	}
+
+    /// <summary>
+    /// Resets the number of full matches that have been made in this chain.
+    /// </summary>
+    public virtual void ResetFullMatchesCount()
+    {
+        numFullMatches = 0;
+    }
 }

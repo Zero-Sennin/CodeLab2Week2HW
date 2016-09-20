@@ -211,7 +211,7 @@ public class MoveTokensScript : MonoBehaviour
             }
         }
 
-        if (lerpPercent == 1) //If the lerp percent is 
+        if (lerpPercent == 1) //If the lerp percentage is complete
         {
             move = false;
         }
