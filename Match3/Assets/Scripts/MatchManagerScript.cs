@@ -39,8 +39,8 @@ public class MatchManagerScript : MonoBehaviour {
 				}
 
                 if (y < gameManager.gridHeight - 2)
-                {   //GridHasHorizontalMatch checks 2 to the right
-                    //gameManager.gridWidth - 2 ensures you're never extending into
+                {   //GridHasVerticalMatch checks 2 above
+                    //gameManager.gridHeight - 2 ensures you're never extending into
                     //a space that doesn't exist
                     match = match || GridHasVerticalMatch(x, y); //if match was ever set to true, it stays true forever
                 }

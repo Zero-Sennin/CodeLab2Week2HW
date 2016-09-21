@@ -39,7 +39,7 @@ public class InputManagerScript : MonoBehaviour {
 					Vector2 pos2 = gameManager.GetPositionOfTokenInGrid(collider.gameObject);
 
 					//if they're next to each other, swap them
-					if(Mathf.Abs((pos1.x - pos2.x) + (pos1.y - pos2.y)) == 1){
+					if(Mathf.Abs(pos1.x - pos2.x) + Mathf.Abs(pos1.y - pos2.y) == 1){
 						moveManager.SetupTokenExchange(selected, pos1, collider.gameObject, pos2, true);
 					}
 					//then deselect our current token (because we're about to destroy or forget it)

@@ -181,6 +181,7 @@ public class MoveTokensScript : MonoBehaviour
             */
             gameManager.gridArray[endGridX, endGridY] = token; 
             gameManager.gridArray[startGridX, startGridY] = null;
+            GetComponent<RepopulateScript>().AddNewTokensToRepopulateGrid();
         }
     }
 
@@ -196,7 +197,7 @@ public class MoveTokensScript : MonoBehaviour
         {
             for (int y = 1; y < gameManager.gridHeight; y++) //...and for the height of the grid...
             {
-                if (gameManager.gridArray[x, y - 1] == null) //If we find an empty space:
+                if (gameManager.gridArray[x, y - 1] == null && gameManager.gridArray[x,y]!= null) //If we find an empty space:
                 {
                     for (int pos = y; pos < gameManager.gridHeight; pos++) //...using the y position as a reference...
                     {
