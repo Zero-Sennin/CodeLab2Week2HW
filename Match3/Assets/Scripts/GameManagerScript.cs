@@ -33,6 +33,13 @@ public class GameManagerScript : MonoBehaviour {
 
     float currentMatchChainTime, maxChainTime;
 
+    protected bool gameReady;
+
+    public bool GameReady
+    {
+        get { return gameReady; }
+    }
+
 	public virtual void Start () {
 		//load the tokens, make the grid, and create references to the other scripts
 		tokenTypes = (Object[])Resources.LoadAll("Tokens/");
@@ -46,38 +53,45 @@ public class GameManagerScript : MonoBehaviour {
 
 	public virtual void Update(){
 		//every frame, check whether the grid is full of tokens.
+        if (gameReady)
+        { 
+		    if(!GridHasEmpty()){
+			    //if the grid is full of tokens and has matches, remove them.
+			    if(matchManager.GridHasMatch()){
+				    matchManager.RemoveMatches();
+			    } else {
+				    //if the grid is full and there are no matches, wait for the player to make a move (and look for it in InputManager)
+				    inputManager.SelectToken();
 
-		if(!GridHasEmpty()){
-			//if the grid is full of tokens and has matches, remove them.
-			if(matchManager.GridHasMatch()){
-				matchManager.RemoveMatches();
-			} else {
-				//if the grid is full and there are no matches, wait for the player to make a move (and look for it in InputManager)
-				inputManager.SelectToken();
+                    if (currentMatchChainTime > 0f)
+                    {
+                        currentMatchChainTime -= Time.deltaTime;
+                    }
 
-                if (currentMatchChainTime > 0f)
-                {
-                    currentMatchChainTime -= Time.deltaTime;
+                    else
+                    {
+                        currentMatchChainTime = 0f;
+                        matchManager.ResetFullMatchesCount();
+                    }
                 }
 
-                else if (currentMatchChainTime <= 0f)
-                {
-                    currentMatchChainTime = 0f;
-                    matchManager.ResetFullMatchesCount();
-                }
-            }
+		    } else {
+			    if(!moveTokenManager.move){
+				    //if the icons are currently moving, set them up to move and leave it be
+				    moveTokenManager.SetupTokenMove();
+			    }
+			    if(!moveTokenManager.MoveTokensToFillEmptySpaces()){
+				    //if the MoveTokenManager hasn't added any tokens to the grid
+				    //tell Repopulate Script to add new tokens
+				    repopulateManager.AddNewTokensToRepopulateGrid();
+			    }
+		    }
+        }
 
-		} else {
-			if(!moveTokenManager.move){
-				//if the icons are currently moving, set them up to move and leave it be
-				moveTokenManager.SetupTokenMove();
-			}
-			if(!moveTokenManager.MoveTokensToFillEmptySpaces()){
-				//if the MoveTokenManager hasn't added any tokens to the grid
-				//tell Repopulate Script to add new tokens
-				repopulateManager.AddNewTokensToRepopulateGrid();
-			}
-		}
+        else
+        {
+            BeginGridWithNoMatches(); //Borrowed from Burgess
+        }
 
         scoreText.text = "Score: " + score;
         matchChainText.text = "Match Chain: " + matchManager.NumFullMatches;
@@ -117,10 +131,13 @@ public class GameManagerScript : MonoBehaviour {
 
     public virtual void UpdateScore(int valueToAdd)
     {
-        score += valueToAdd;
-        GameObject floatText = Instantiate(floatTextPrefab, GameObject.Find("Canvas").transform.position, Quaternion.identity) as GameObject;
-        floatText.transform.SetParent(GameObject.Find("Canvas").transform, false);
-        floatText.GetComponent<UIItem_ScoreIncreaseScript>().SetTextValue(valueToAdd);
+        if (gameReady)
+        { 
+            score += valueToAdd;
+            GameObject floatText = Instantiate(floatTextPrefab, GameObject.Find("Canvas").transform.position, Quaternion.identity) as GameObject;
+            floatText.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            floatText.GetComponent<UIItem_ScoreIncreaseScript>().SetTextValue(valueToAdd);
+        }
     }
 
 	/// <summary>
@@ -174,6 +191,35 @@ public class GameManagerScript : MonoBehaviour {
 		//then, we put this token into the array of tokens
 		gridArray[x, y] = token;
 	}
+
+    // if grid has a match, remove them, then immediately repopulate; don't wait for animation
+    // if the grid has no matches, set gameReady to true to begin game.
+    void BeginGridWithNoMatches()
+    {
+        if (matchManager.GridHasMatch())
+        {
+            matchManager.RemoveMatches();
+            ImmediatelyRepopulateRemovedTokens();
+        }
+        else {
+            gameReady = true;
+        }
+    }
+
+    // iterate over each grid position, if a position is null (a taken has been removed), add a new token to that position
+    void ImmediatelyRepopulateRemovedTokens()
+    {
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                if (gridArray[x, y] == null)
+                {
+                    AddTokenToPosInGrid(x, y, grid);
+                }
+            }
+        }
+    }
 
     public void SetBonusTimer(float maxTime)
     {

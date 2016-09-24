@@ -227,16 +227,24 @@ public class MatchManagerScript : MonoBehaviour {
             }
 		}
 
-        //If we've made a full match, increment the total number of matches we've made in this chain.
-        if (numRemoved >= 2)
-        {
-            numFullMatches += 1;
+        if (gameManager.GameReady)
+        { 
+            //If we've made a full match, increment the total number of matches we've made in this chain.
+            if (numRemoved >= 2)
+            {
+                numFullMatches += 1;
+            }
+
+            //Increase our score based on how many full matches we've made in this current combo.
+            gameManager.UpdateScore(5 * numFullMatches);
+            gameManager.SetBonusTimer(5f);
         }
 
-        //Increase our score based on how many full matches we've made in this current combo.
-        gameManager.UpdateScore(5 * numFullMatches);
-        gameManager.SetBonusTimer(5f);
-		return numRemoved;
+        else
+        {
+            numRemoved = 0;
+        }
+        return numRemoved;
 	}
 
     /// <summary>
