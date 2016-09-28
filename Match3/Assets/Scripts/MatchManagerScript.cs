@@ -102,7 +102,35 @@ public class MatchManagerScript : MonoBehaviour {
             return false;
         }
     }
-    
+
+    /// <summary>
+	/// Check if there is a vertical match, based on the bottommost token.
+	/// </summary>
+	/// <returns><c>true</c> there is a horizontal match originating at these coordinates, 
+	/// <c>false</c> otherwise.</returns>
+	/// <param name="x">The x coordinate of the token to check.</param>
+	/// <param name="y">The y coordinate of the token to check.</param>
+	public bool GridHasDiagMatch(int x, int y)
+    {
+        //check the token at given coordinates, the token above it, and the token 2 above it
+        GameObject token1 = gameManager.gridArray[x, y + 0];
+        GameObject token2 = gameManager.gridArray[x + 1, y + 1];
+        GameObject token3 = gameManager.gridArray[x + 2, y + 2];
+
+        if (token1 != null && token2 != null && token3 != null)
+        { //ensure all of the token exists
+            SpriteRenderer sr1 = token1.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr2 = token2.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr3 = token3.GetComponent<SpriteRenderer>();
+
+            return (sr1.sprite == sr2.sprite && sr2.sprite == sr3.sprite);  //compare their sprites
+                                                                            //to see if they're the same
+        }
+        else {
+            return false;
+        }
+    }
+
     /// <summary>
     /// Determine how far to the right a match extends.
     /// </summary>
@@ -158,6 +186,45 @@ public class MatchManagerScript : MonoBehaviour {
             for (int i = y + 1; i < gameManager.gridHeight; i++)
             {
                 GameObject other = gameManager.gridArray[x, i];
+
+                if (other != null)
+                {
+                    SpriteRenderer sr2 = other.GetComponent<SpriteRenderer>();
+
+                    if (sr1.sprite == sr2.sprite)
+                    {
+                        matchLength++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+        }
+
+        return matchLength;
+    }
+
+    public int GetDiagMatchLength(int x, int y)
+    {
+        int matchLength = 1;
+
+        GameObject first = gameManager.gridArray[x, y]; //get the gameobject at the provided coordinates
+
+        //make sure the script found a gameobject, and--if so--get its sprite
+        if (first != null)
+        {
+            SpriteRenderer sr1 = first.GetComponent<SpriteRenderer>();
+
+            //compare the gameobject's sprite to the sprite one above, two above, etc.
+            //each time the script finds a match, increment matchLength
+            //stop when it's not a match, or if the matches extend to the edge of the play area
+            for (int i = y + 1; i < gameManager.gridHeight; i++)
+            {
+                GameObject other = gameManager.gridArray[x + i, i];
 
                 if (other != null)
                 {

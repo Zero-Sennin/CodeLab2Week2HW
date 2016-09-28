@@ -31,7 +31,7 @@ public class GameManagerScript : MonoBehaviour {
 
     public Image matchBonusTimerMeter;
 
-    float currentMatchChainTime, maxChainTime;
+    float currentMatchChainTime = 0f, maxChainTime = 10f;
 
     protected bool gameReady;
 
@@ -136,6 +136,9 @@ public class GameManagerScript : MonoBehaviour {
             score += valueToAdd;
             GameObject floatText = Instantiate(floatTextPrefab, GameObject.Find("Canvas").transform.position, Quaternion.identity) as GameObject;
             floatText.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            Vector3 floatTextLoc = floatText.GetComponent<RectTransform>().position;
+            floatTextLoc.x = 95f;
+            floatText.GetComponent<RectTransform>().position = floatTextLoc;
             floatText.GetComponent<UIItem_ScoreIncreaseScript>().SetTextValue(valueToAdd);
         }
     }
